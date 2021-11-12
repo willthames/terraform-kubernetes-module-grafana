@@ -1,0 +1,2 @@
+traces:
+  jaeger.thriftHttp=true

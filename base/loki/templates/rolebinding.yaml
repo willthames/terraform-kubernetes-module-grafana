@@ -1,0 +1,19 @@
+---
+# Source: loki/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: grafana-loki
+  namespace: monitoring
+  labels:
+    app: loki
+    chart: loki-2.8.1
+    heritage: Helm
+    release: grafana
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: grafana-loki
+subjects:
+- kind: ServiceAccount
+  name: grafana-loki

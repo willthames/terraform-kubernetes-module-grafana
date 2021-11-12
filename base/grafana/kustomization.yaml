@@ -1,0 +1,17 @@
+resources:
+  - templates/podsecuritypolicy.yaml
+  - templates/deployment.yaml
+  - templates/role.yaml
+  - templates/tests/test.yaml
+  - templates/tests/test-configmap.yaml
+  - templates/tests/test-serviceaccount.yaml
+  - templates/tests/test-rolebinding.yaml
+  - templates/tests/test-podsecuritypolicy.yaml
+  - templates/tests/test-role.yaml
+  - templates/service.yaml
+  - templates/clusterrole.yaml
+  - templates/serviceaccount.yaml
+  - templates/configmap.yaml
+  - templates/clusterrolebinding.yaml
+  - templates/rolebinding.yaml
+  - templates/secret.yaml

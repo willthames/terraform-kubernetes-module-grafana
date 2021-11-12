@@ -1,0 +1,23 @@
+---
+# Source: loki/templates/service-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-loki-headless
+  namespace: monitoring
+  labels:
+    app: loki
+    chart: loki-2.8.1
+    release: grafana
+    heritage: Helm
+    variant: headless
+spec:
+  clusterIP: None
+  ports:
+    - port: 3100
+      protocol: TCP
+      name: http-metrics
+      targetPort: http-metrics
+  selector:
+    app: loki
+    release: grafana
