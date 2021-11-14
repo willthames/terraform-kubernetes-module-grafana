@@ -1,0 +1,17 @@
+resources:
+  - templates/service-gossip-ring.yaml
+  - templates/ingester/statefulset-ingester.yaml
+  - templates/ingester/service-ingester.yaml
+  - templates/querier/service-querier.yaml
+  - templates/querier/deployment-querier.yaml
+  - templates/memcached/service-memcached.yaml
+  - templates/memcached/statefulset-memcached.yaml
+  - templates/configmap-tempo.yaml
+  - templates/serviceaccount.yaml
+  - templates/distributor/deployment-distributor.yaml
+  - templates/distributor/service-distributor.yaml
+  - templates/compactor/service-compactor.yaml
+  - templates/compactor/deployment-compactor.yaml
+  - templates/query-frontend/deployment-query-frontend.yaml
+  - templates/query-frontend/service-query-frontend.yaml
+  - templates/query-frontend/service-query-frontend-discovery.yaml

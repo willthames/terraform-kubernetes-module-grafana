@@ -1,0 +1,98 @@
+---
+# Source: tempo-distributed/templates/query-frontend/deployment-query-frontend.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tempo-tempo-distributed-query-frontend
+  namespace: monitoring
+  labels:
+    helm.sh/chart: tempo-distributed-0.11.0
+    app.kubernetes.io/name: tempo-distributed
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/version: "1.2.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tempo-distributed
+      app.kubernetes.io/instance: tempo
+      app.kubernetes.io/component: query-frontend
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: tempo-distributed-0.11.0
+        app.kubernetes.io/name: tempo-distributed
+        app.kubernetes.io/instance: tempo
+        app.kubernetes.io/version: "1.2.0"
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: query-frontend
+        tempo-gossip-member: "true"
+      annotations:
+        checksum/config: 1bb786731e82782f806efe7c123d92446adcf58c11e0c74c074f3df94c3c27a9
+    spec:
+      serviceAccountName: tempo-tempo-distributed
+      containers:
+        - args:
+            - -target=query-frontend
+            - -config.file=/conf/tempo.yaml
+            - -mem-ballast-size-mbs=1024
+          image: docker.io/grafana/tempo:1.2.0
+          imagePullPolicy: IfNotPresent
+          name: query-frontend
+          ports:
+            - containerPort: 3100
+              name: http
+            - containerPort: 9095
+              name: grpc
+          resources:
+            {}
+          volumeMounts:
+            - mountPath: /conf
+              name: tempo-conf
+        - args:
+            - --query.base-path=/
+            - --grpc-storage-plugin.configuration-file=/conf/tempo-query.yaml
+            - --query.bearer-token-propagation=true
+          image: docker.io/grafana/tempo-query:1.2.0
+          imagePullPolicy: IfNotPresent
+          name: tempo-query
+          ports:
+            - containerPort: 16686
+              name: jaeger-ui
+            - containerPort: 16687
+              name: jaeger-metrics
+          resources:
+            {}
+          volumeMounts:
+            - mountPath: /conf
+              name: tempo-conf
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: tempo-distributed
+                  app.kubernetes.io/instance: tempo
+                  app.kubernetes.io/component: query-frontend
+              topologyKey: kubernetes.io/hostname
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: tempo-distributed
+                    app.kubernetes.io/instance: tempo
+                    app.kubernetes.io/component: query-frontend
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+        
+      volumes:
+        - configMap:
+            name: tempo-tempo-distributed
+          name: tempo-conf

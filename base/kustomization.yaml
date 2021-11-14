@@ -1,3 +1,4 @@
 resources:
   - loki
   - grafana
+  - tempo-distributed

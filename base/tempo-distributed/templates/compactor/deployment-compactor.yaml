@@ -1,0 +1,63 @@
+---
+# Source: tempo-distributed/templates/compactor/deployment-compactor.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tempo-tempo-distributed-compactor
+  namespace: monitoring
+  labels:
+    helm.sh/chart: tempo-distributed-0.11.0
+    app.kubernetes.io/name: tempo-distributed
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/version: "1.2.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: compactor
+spec:
+  minReadySeconds: 10
+  replicas: 
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tempo-distributed
+      app.kubernetes.io/instance: tempo
+      app.kubernetes.io/component: compactor
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: tempo-distributed-0.11.0
+        app.kubernetes.io/name: tempo-distributed
+        app.kubernetes.io/instance: tempo
+        app.kubernetes.io/version: "1.2.0"
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: compactor
+        tempo-gossip-member: "true"
+      annotations:
+        checksum/config: 1bb786731e82782f806efe7c123d92446adcf58c11e0c74c074f3df94c3c27a9
+    spec:
+      serviceAccountName: tempo-tempo-distributed
+      containers:
+        - args:
+            - -target=compactor
+            - -config.file=/conf/tempo.yaml
+            - -mem-ballast-size-mbs=1024
+          image: docker.io/grafana/tempo:1.2.0
+          imagePullPolicy: IfNotPresent
+          name: compactor
+          ports:
+            - containerPort: 3100
+              name: http
+            - containerPort: 7946
+              name: http-memberlist
+          resources:
+            {}
+          volumeMounts:
+            - mountPath: /conf
+              name: tempo-conf
+      volumes:
+        - configMap:
+            name: tempo-tempo-distributed
+          name: tempo-conf

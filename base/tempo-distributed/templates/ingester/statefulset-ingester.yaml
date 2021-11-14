@@ -1,0 +1,91 @@
+---
+# Source: tempo-distributed/templates/ingester/statefulset-ingester.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: tempo-tempo-distributed-ingester
+  namespace: monitoring
+  labels:
+    helm.sh/chart: tempo-distributed-0.11.0
+    app.kubernetes.io/name: tempo-distributed
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/version: "1.2.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: ingester
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tempo-distributed
+      app.kubernetes.io/instance: tempo
+      app.kubernetes.io/component: ingester
+  serviceName: ingester
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: tempo-distributed-0.11.0
+        app.kubernetes.io/name: tempo-distributed
+        app.kubernetes.io/instance: tempo
+        app.kubernetes.io/version: "1.2.0"
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: ingester
+        tempo-gossip-member: "true"
+      annotations:
+        checksum/config: 1bb786731e82782f806efe7c123d92446adcf58c11e0c74c074f3df94c3c27a9
+    spec:
+      serviceAccountName: tempo-tempo-distributed
+      containers:
+        - args:
+            - -target=ingester
+            - -config.file=/conf/tempo.yaml
+            - -mem-ballast-size-mbs=1024
+          image: docker.io/grafana/tempo:1.2.0
+          imagePullPolicy: IfNotPresent
+          name: ingester
+          ports:
+            - name: grpc
+              containerPort: 9095
+            - name: http-memberlist
+              containerPort: 7946
+            - name: http
+              containerPort: 3100
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+          resources:
+            {}
+          volumeMounts:
+            - mountPath: /conf
+              name: tempo-conf
+            - mountPath: /var/tempo
+              name: data
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: tempo-distributed
+                  app.kubernetes.io/instance: tempo
+                  app.kubernetes.io/component: ingester
+              topologyKey: kubernetes.io/hostname
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: tempo-distributed
+                    app.kubernetes.io/instance: tempo
+                    app.kubernetes.io/component: ingester
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+        
+      volumes:
+        - configMap:
+            name: tempo-tempo-distributed
+          name: tempo-conf
+        - name: data
+          emptyDir: {}

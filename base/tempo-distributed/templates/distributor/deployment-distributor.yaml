@@ -1,0 +1,88 @@
+---
+# Source: tempo-distributed/templates/distributor/deployment-distributor.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tempo-tempo-distributed-distributor
+  namespace: monitoring
+  labels:
+    helm.sh/chart: tempo-distributed-0.11.0
+    app.kubernetes.io/name: tempo-distributed
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/version: "1.2.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: distributor
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tempo-distributed
+      app.kubernetes.io/instance: tempo
+      app.kubernetes.io/component: distributor
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: tempo-distributed-0.11.0
+        app.kubernetes.io/name: tempo-distributed
+        app.kubernetes.io/instance: tempo
+        app.kubernetes.io/version: "1.2.0"
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: distributor
+        tempo-gossip-member: "true"
+      annotations:
+        checksum/config: 1bb786731e82782f806efe7c123d92446adcf58c11e0c74c074f3df94c3c27a9
+    spec:
+      serviceAccountName: tempo-tempo-distributed
+      containers:
+        - args:
+            - -target=distributor
+            - -config.file=/conf/tempo.yaml
+            - -mem-ballast-size-mbs=1024
+          image: docker.io/grafana/tempo:1.2.0
+          imagePullPolicy: IfNotPresent
+          name: distributor
+          ports:
+            - containerPort: 7946
+              name: http-memberlist
+              protocol: TCP
+            - containerPort: 3100
+              name: http
+            - containerPort: 14268
+              name: jaeger-http
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+          resources:
+            {}
+          volumeMounts:
+            - mountPath: /conf
+              name: tempo-conf
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: tempo-distributed
+                  app.kubernetes.io/instance: tempo
+                  app.kubernetes.io/component: distributor
+              topologyKey: kubernetes.io/hostname
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: tempo-distributed
+                    app.kubernetes.io/instance: tempo
+                    app.kubernetes.io/component: distributor
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+        
+      volumes:
+        - configMap:
+            name: tempo-tempo-distributed
+          name: tempo-conf

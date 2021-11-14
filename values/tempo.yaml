@@ -1,2 +1,3 @@
 traces:
-  jaeger.thriftHttp=true
+  jaeger:
+    thriftHttp: true

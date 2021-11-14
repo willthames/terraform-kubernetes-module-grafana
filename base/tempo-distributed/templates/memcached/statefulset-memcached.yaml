@@ -1,0 +1,63 @@
+---
+# Source: tempo-distributed/templates/memcached/statefulset-memcached.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: tempo-tempo-distributed-memcached
+  namespace: monitoring
+  labels:
+    helm.sh/chart: tempo-distributed-0.11.0
+    app.kubernetes.io/name: tempo-distributed
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/version: "1.2.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: memcached
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tempo-distributed
+      app.kubernetes.io/instance: tempo
+      app.kubernetes.io/component: memcached
+  serviceName: memcached
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: tempo-distributed-0.11.0
+        app.kubernetes.io/name: tempo-distributed
+        app.kubernetes.io/instance: tempo
+        app.kubernetes.io/version: "1.2.0"
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: memcached
+    spec:
+      serviceAccountName: tempo-tempo-distributed
+      containers:
+        - image: "memcached:1.5.17-alpine"
+          imagePullPolicy: IfNotPresent
+          name: memcached
+          ports:
+            - containerPort: 11211
+              name: client
+          resources:
+            {}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: tempo-distributed
+                  app.kubernetes.io/instance: tempo
+                  app.kubernetes.io/component: memcached
+              topologyKey: kubernetes.io/hostname
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: tempo-distributed
+                    app.kubernetes.io/instance: tempo
+                    app.kubernetes.io/component: memcached
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+        
+  updateStrategy:
+    type: RollingUpdate
