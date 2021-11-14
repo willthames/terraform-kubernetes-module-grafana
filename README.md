@@ -8,5 +8,6 @@ helm template grafana grafana/loki \
   --namespace monitoring \
   --output-dir base
 helm template grafana grafana/grafana \
+  --values values/grafana.yaml \
   --namespace monitoring \
   --output-dir base

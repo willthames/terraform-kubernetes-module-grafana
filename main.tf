@@ -2,6 +2,36 @@ data "kustomization_overlay" "resources" {
   resources = [
     "${path.module}/base"
   ]
+
+  patches {
+    target = {
+      kind = "Ingress"
+      name = "grafana"
+    }
+    patch = <<-EOF
+    - op: replace
+      path: /spec/rules/0/host
+      value: grafana.${var.domain}
+    EOF
+  }
+  patches {
+    target = {
+      kind = "Deployment"
+      name = "grafana"
+    }
+    patch = <<-EOF
+    - op: add
+      path: /spec/template/spec/containers/0/env/-
+      value:
+        name: GF_SERVER_DOMAIN
+        value: grafana.${var.domain}
+    - op: add
+      path: /spec/template/spec/containers/0/env/-
+      value:
+        name: GF_SERVER_ROOT_URL
+        value: https://grafana.${var.domain}
+    EOF
+  }
 }
 
 # first loop through resources in ids_prio[0]

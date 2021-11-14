@@ -26,10 +26,10 @@ spec:
         app.kubernetes.io/name: grafana
         app.kubernetes.io/instance: grafana
       annotations:
-        checksum/config: a8fefc0b9a8c0ceb0c2640f131c466d113da4701d7be26365ef9c53657869b19
+        checksum/config: 76aa5fe0e29d2c02cb89693c6c8cd1096e65e77c3ceab21e8079f0b5084b7d3a
         checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
         checksum/sc-dashboard-provider-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
-        checksum/secret: d15f3e4871a8716498c4808e05d7bb71fa33c66f3eaa6316d2b3281e7495452c
+        checksum/secret: e9eaa2071f94adf047c44ef9f6aa1d04e1c34602f905ca5bfceb43afe21d2f65
     spec:
       
       serviceAccountName: grafana
@@ -49,6 +49,9 @@ spec:
               subPath: grafana.ini
             - name: storage
               mountPath: "/var/lib/grafana"
+            - name: config
+              mountPath: "/etc/grafana/provisioning/datasources/datasources.yaml"
+              subPath: "datasources.yaml"
           ports:
             - name: service
               containerPort: 80
@@ -76,6 +79,12 @@ spec:
               value: /var/lib/grafana/plugins
             - name: GF_PATHS_PROVISIONING
               value: /etc/grafana/provisioning
+            - name: "GF_AUTH_ANONYMOUS_ENABLED"
+              value: "true"
+            - name: "GF_AUTH_ANONYMOUS_ORG_ROLE"
+              value: "Admin"
+            - name: "GF_AUTH_DISABLE_LOGIN_FORM"
+              value: "true"
           livenessProbe:
             failureThreshold: 10
             httpGet:

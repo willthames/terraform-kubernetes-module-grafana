@@ -3,6 +3,11 @@ env:
   GF_AUTH_ANONYMOUS_ORG_ROLE: 'Admin'
   GF_AUTH_DISABLE_LOGIN_FORM: true
 
+ingress:
+  enabled: true
+  hosts:
+    - grafana.FIXME
+
 datasources:
   datasources.yaml:
     apiVersion: 1

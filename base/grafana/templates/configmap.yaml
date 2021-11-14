@@ -24,3 +24,18 @@ data:
     logs = /var/log/grafana
     plugins = /var/lib/grafana/plugins
     provisioning = /etc/grafana/provisioning
+
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+    - access: proxy
+      apiVersion: 1
+      basicAuth: false
+      editable: false
+      isDefault: true
+      name: Tempo
+      orgId: 1
+      type: tempo
+      uid: tempo
+      url: http://tempo-tempo-distributed-query-frontend:3100
+      version: 1
