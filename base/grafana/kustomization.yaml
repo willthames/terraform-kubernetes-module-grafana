@@ -2,6 +2,7 @@ resources:
   - templates/podsecuritypolicy.yaml
   - templates/deployment.yaml
   - templates/role.yaml
+  - templates/ingress.yaml
   - templates/tests/test.yaml
   - templates/tests/test-configmap.yaml
   - templates/tests/test-serviceaccount.yaml

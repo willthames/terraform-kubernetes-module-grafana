@@ -1,6 +1,6 @@
 data "kustomization_overlay" "resources" {
   resources = [
-    "${path.module}/base"
+    "${path.module}/all"
   ]
 
   patches {
@@ -30,28 +30,6 @@ data "kustomization_overlay" "resources" {
       value:
         name: GF_SERVER_ROOT_URL
         value: https://grafana.${var.domain}
-    EOF
-  }
-  patches {
-    target = {
-      kind = "Service"
-      name = "tempo-tempo-distributed-compactor"
-    }
-    patch = <<-EOF
-    - op: add
-      path: /metadata/namespace
-      value: monitoring
-    EOF
-  }
-  patches {
-    target = {
-      kind = "ServiceAccount"
-      name = "tempo-tempo-distributed"
-    }
-    patch = <<-EOF
-    - op: add
-      path: /metadata/namespace
-      value: monitoring
     EOF
   }
 }

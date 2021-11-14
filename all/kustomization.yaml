@@ -1,0 +1,15 @@
+resources:
+  - ../base
+
+patches:
+  - target:
+      kind: ServiceAccount
+      name: tempo-tempo-distributed
+    path: patches/namespace.yaml
+  - target:
+      kind: Service
+      name: tempo-tempo-distributed-compactor
+    path: patches/namespace.yaml
+  - target:
+      kind: Ingress
+    path: patches/certificate.yaml
