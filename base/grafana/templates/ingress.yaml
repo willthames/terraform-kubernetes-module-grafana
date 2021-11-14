@@ -12,6 +12,10 @@ metadata:
     app.kubernetes.io/version: "8.2.3"
     app.kubernetes.io/managed-by: Helm
 spec:
+  tls:
+    - hosts:
+      - grafana.FIXME
+      secretName: grafana-tls
   rules:
     - host: grafana.FIXME
       http:

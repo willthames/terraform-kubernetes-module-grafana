@@ -12,6 +12,9 @@ data "kustomization_overlay" "resources" {
     - op: replace
       path: /spec/rules/0/host
       value: grafana.${var.domain}
+    - op: replace
+      path: /spec/tls/0/hosts/0
+      value: grafana.${var.domain}
     EOF
   }
   patches {
