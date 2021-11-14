@@ -32,10 +32,15 @@ data:
       apiVersion: 1
       basicAuth: false
       editable: false
-      isDefault: true
+      isDefault: false
       name: Tempo
       orgId: 1
       type: tempo
       uid: tempo
       url: http://tempo-tempo-distributed-query-frontend:3100
       version: 1
+    - access: proxy
+      isDefault: true
+      name: Prometheus
+      type: prometheus
+      url: http://prometheus-kube-prometheus-prometheus:9090

@@ -23,8 +23,17 @@ datasources:
         orgId: 1
         url: http://tempo-tempo-distributed-query-frontend:3100
         basicAuth: false
-        isDefault: true
+        isDefault: false
         version: 1
         editable: false
         apiVersion: 1
         uid: tempo
+      - name: Prometheus
+        type: prometheus
+        url: http://prometheus-kube-prometheus-prometheus:9090 
+        access: proxy
+        isDefault: true
+
+sidecar:
+  dashboards:
+    enabled: true

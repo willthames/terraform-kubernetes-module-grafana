@@ -1,5 +1,6 @@
 resources:
   - templates/podsecuritypolicy.yaml
+  - templates/configmap-dashboard-provider.yaml
   - templates/deployment.yaml
   - templates/role.yaml
   - templates/ingress.yaml

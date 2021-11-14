@@ -26,10 +26,10 @@ spec:
         app.kubernetes.io/name: grafana
         app.kubernetes.io/instance: grafana
       annotations:
-        checksum/config: 76aa5fe0e29d2c02cb89693c6c8cd1096e65e77c3ceab21e8079f0b5084b7d3a
+        checksum/config: 53264ec46dac985a1bf305d5ef44e510af4b273c0c6c19736162b3648c0bb69a
         checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
-        checksum/sc-dashboard-provider-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
-        checksum/secret: bb8ff1fb7907d74e499d31e1299eada0166967083d9305ee6c1e8bd7d0d9f0df
+        checksum/sc-dashboard-provider-config: 50773093bbb81910795fbe1158b250c166b56f206788961e1be95fe5029cb07b
+        checksum/secret: 24ae0c373590b329339de5abc6eec3eeb15c189311ed07167426246c0f7ab5a3
     spec:
       
       serviceAccountName: grafana
@@ -40,6 +40,23 @@ spec:
         runAsUser: 472
       enableServiceLinks: true
       containers:
+        - name: grafana-sc-dashboard
+          image: "quay.io/kiwigrid/k8s-sidecar:1.14.2"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: METHOD
+              value: 
+            - name: LABEL
+              value: "grafana_dashboard"
+            - name: FOLDER
+              value: "/tmp/dashboards"
+            - name: RESOURCE
+              value: "both"
+          resources:
+            {}
+          volumeMounts:
+            - name: sc-dashboard-volume
+              mountPath: "/tmp/dashboards"
         - name: grafana
           image: "grafana/grafana:8.2.3"
           imagePullPolicy: IfNotPresent
@@ -52,6 +69,12 @@ spec:
             - name: config
               mountPath: "/etc/grafana/provisioning/datasources/datasources.yaml"
               subPath: "datasources.yaml"
+            - name: sc-dashboard-volume
+              mountPath: "/tmp/dashboards"
+      
+            - name: sc-dashboard-provider
+              mountPath: "/etc/grafana/provisioning/dashboards/sc-dashboardproviders.yaml"
+              subPath: provider.yaml
           ports:
             - name: service
               containerPort: 80
@@ -104,3 +127,8 @@ spec:
             name: grafana
         - name: storage
           emptyDir: {}
+        - name: sc-dashboard-volume
+          emptyDir: {}
+        - name: sc-dashboard-provider
+          configMap:
+            name: grafana-config-dashboards
