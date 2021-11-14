@@ -37,10 +37,13 @@ data:
       orgId: 1
       type: tempo
       uid: tempo
-      url: http://tempo-tempo-distributed-query-frontend:3100
+      url: http://tempo-tempo-distributed-query-frontend.monitoring.svc.cluster.local:3100
       version: 1
     - access: proxy
       isDefault: true
       name: Prometheus
       type: prometheus
-      url: http://prometheus-kube-prometheus-prometheus:9090
+      url: http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
+    - name: Loki
+      type: loki
+      url: http://grafana-loki.monitoring.svc.cluster.local:3100

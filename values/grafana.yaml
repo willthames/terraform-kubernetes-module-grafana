@@ -21,7 +21,7 @@ datasources:
         type: tempo
         access: proxy
         orgId: 1
-        url: http://tempo-tempo-distributed-query-frontend:3100
+        url: http://tempo-tempo-distributed-query-frontend.monitoring.svc.cluster.local:3100
         basicAuth: false
         isDefault: false
         version: 1
@@ -30,9 +30,12 @@ datasources:
         uid: tempo
       - name: Prometheus
         type: prometheus
-        url: http://prometheus-kube-prometheus-prometheus:9090 
+        url: http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
         access: proxy
         isDefault: true
+      - name: Loki
+        type: loki
+        url: http://grafana-loki.monitoring.svc.cluster.local:3100
 
 sidecar:
   dashboards:
