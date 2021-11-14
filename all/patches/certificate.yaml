@@ -2,4 +2,4 @@ kind: Ingress
 metadata:
   name: doesnotmatter
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-staging
+    cert-manager.io/cluster-issuer: letsencrypt-prod
