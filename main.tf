@@ -32,6 +32,28 @@ data "kustomization_overlay" "resources" {
         value: https://grafana.${var.domain}
     EOF
   }
+  patches {
+    target = {
+      kind = "Service"
+      name = "tempo-tempo-distributed-compactor"
+    }
+    patch = <<-EOF
+    - op: add
+      path: /metadata/namespace
+      value: monitoring
+    EOF
+  }
+  patches {
+    target = {
+      kind = "ServiceAccount"
+      name = "tempo-tempo-distributed"
+    }
+    patch = <<-EOF
+    - op: add
+      path: /metadata/namespace
+      value: monitoring
+    EOF
+  }
 }
 
 # first loop through resources in ids_prio[0]
